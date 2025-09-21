@@ -1,0 +1,393 @@
+{% extends "base.html" %}
+
+{% block title %}Generate Design - AI Fashion Assistant{% endblock %}
+
+{% block extra_css %}
+<style>
+    .generate-header {
+        text-align: center;
+        margin-bottom: 3rem;
+    }
+
+    .generate-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        background: linear-gradient(45deg, #3498db, #2ecc71);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 0.5rem;
+    }
+
+    .generate-subtitle {
+        color: #5a6c7d;
+        font-size: 1.1rem;
+        max-width: 600px;
+        margin: 0 auto;
+        line-height: 1.6;
+    }
+
+    .generation-section {
+        max-width: 800px;
+        margin: 0 auto;
+    }
+
+    .prompt-section {
+        background: rgba(255, 255, 255, 0.9);
+        border-radius: 20px;
+        padding: 2rem;
+        margin-bottom: 3rem;
+        box-shadow: 0 10px 30px rgba(52, 152, 219, 0.1);
+        border: 1px solid rgba(116, 185, 255, 0.1);
+    }
+
+    .prompt-textarea {
+        width: 100%;
+        min-height: 120px;
+        padding: 1rem;
+        border: 2px solid #e1e5e9;
+        border-radius: 15px;
+        font-size: 16px;
+        font-family: 'Poppins', sans-serif;
+        resize: vertical;
+        transition: all 0.3s ease;
+        background: rgba(255, 255, 255, 0.9);
+    }
+
+    .prompt-textarea:focus {
+        outline: none;
+        border-color: #3498db;
+        box-shadow: 0 0 20px rgba(52, 152, 219, 0.15);
+    }
+
+    .prompt-examples {
+        margin-top: 1rem;
+    }
+
+    .example-chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-top: 0.5rem;
+    }
+
+    .example-chip {
+        background: #e3f2fd;
+        color: #3498db;
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-size: 0.9rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        border: 1px solid #bbdefb;
+    }
+
+    .example-chip:hover {
+        background: #3498db;
+        color: white;
+        transform: translateY(-2px);
+    }
+
+    .generate-btn {
+        width: 100%;
+        padding: 15px;
+        font-size: 1.1rem;
+        margin-top: 1rem;
+    }
+
+    .results-section {
+        margin-top: 3rem;
+        display: none;
+    }
+
+    .generated-image {
+        width: 100%;
+        max-width: 512px;
+        border-radius: 20px;
+        box-shadow: 0 15px 40px rgba(52, 152, 219, 0.2);
+        margin: 0 auto;
+        display: block;
+    }
+
+    .image-actions {
+        text-align: center;
+        margin-top: 2rem;
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .prompt-display {
+        background: rgba(255, 255, 255, 0.9);
+        border-radius: 15px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        border: 1px solid rgba(116, 185, 255, 0.1);
+        text-align: center;
+    }
+
+    .prompt-text {
+        font-style: italic;
+        color: #5a6c7d;
+        font-size: 1.1rem;
+    }
+
+    .loading-generation {
+        display: none;
+        text-align: center;
+        padding: 3rem;
+        background: rgba(255, 255, 255, 0.9);
+        border-radius: 20px;
+        margin-top: 2rem;
+        border: 1px solid rgba(116, 185, 255, 0.1);
+    }
+
+    .generation-spinner {
+        width: 60px;
+        height: 60px;
+        border: 4px solid #e3f2fd;
+        border-top: 4px solid #3498db;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin: 0 auto 1rem;
+    }
+
+    .loading-text {
+        color: #5a6c7d;
+        font-size: 1.1rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .loading-subtext {
+        color: #74b9ff;
+        font-size: 0.9rem;
+    }
+
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+    @media (max-width: 768px) {
+        .generate-title {
+            font-size: 2rem;
+        }
+        
+        .image-actions {
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .example-chips {
+            justify-content: center;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="generate-header">
+    <h1 class="generate-title">
+        <i class="fas fa-palette"></i> AI Fashion Generator
+    </h1>
+    <p class="generate-subtitle">
+        Describe your dream fashion item and watch our AI bring it to life. 
+        Be specific about style, colors, materials, and details for best results.
+    </p>
+</div>
+
+<div class="generation-section">
+    <div class="prompt-section">
+        <form id="generateForm">
+            <div class="form-group">
+                <label class="form-label">
+                    <i class="fas fa-edit"></i> Describe Your Fashion Design
+                </label>
+                <textarea id="promptText" class="prompt-textarea" 
+                    placeholder="Example: A elegant evening dress with flowing silk fabric, deep blue color, off-shoulder design, floor-length with subtle shimmer details..."
+                    required></textarea>
+            </div>
+
+            <div class="prompt-examples">
+                <label class="form-label">
+                    <i class="fas fa-lightbulb"></i> Quick Examples (Click to Use)
+                </label>
+                <div class="example-chips">
+                    <span class="example-chip" onclick="useExample('A minimalist white cotton t-shirt with clean lines')">Minimalist T-Shirt</span>
+                    <span class="example-chip" onclick="useExample('A vintage black leather jacket with silver zippers')">Vintage Leather Jacket</span>
+                    <span class="example-chip" onclick="useExample('A flowing summer dress with floral pattern')">Summer Floral Dress</span>
+                    <span class="example-chip" onclick="useExample('A navy blue business suit, slim fit')">Business Suit</span>
+                    <span class="example-chip" onclick="useExample('A cozy cream knit sweater, oversized fit')">Cozy Sweater</span>
+                    <span class="example-chip" onclick="useExample('A structured leather handbag with gold hardware')">Designer Handbag</span>
+                    <span class="example-chip" onclick="useExample('A red cocktail dress, elegant evening wear')">Cocktail Dress</span>
+                    <span class="example-chip" onclick="useExample('A casual denim jacket, distressed style')">Denim Jacket</span>
+                </div>
+            </div>
+
+            <div class="prompt-tips" style="background: #f0f8ff; padding: 1rem; border-radius: 10px; margin-top: 1rem; border-left: 4px solid #74b9ff;">
+                <h4 style="color: #2c3e50; margin-bottom: 0.5rem;"><i class="fas fa-lightbulb"></i> Tips for Better Results:</h4>
+                <ul style="color: #5a6c7d; font-size: 0.9rem; margin: 0; padding-left: 1.2rem;">
+                    <li>Keep prompts between 20-100 characters for best results</li>
+                    <li>Include specific details: color, material, style, occasion</li>
+                    <li>Use fashion terms: "elegant", "casual", "vintage", "modern"</li>
+                    <li>Avoid complex scenes - focus on single garments</li>
+                </ul>
+            </div>
+
+            <button type="submit" class="btn generate-btn">
+                <i class="fas fa-magic"></i> Generate Fashion Design
+            </button>
+        </form>
+    </div>
+
+    <div id="loadingGeneration" class="loading-generation">
+        <div class="generation-spinner"></div>
+        <div class="loading-text">Creating your unique design...</div>
+        <div class="loading-subtext">This may take 30-60 seconds</div>
+    </div>
+
+    <div id="resultsSection" class="results-section">
+        <div id="promptDisplay" class="prompt-display">
+            <div class="prompt-text"></div>
+        </div>
+        
+        <div class="text-center">
+            <img id="generatedImage" class="generated-image" alt="Generated Fashion Design">
+        </div>
+
+        <div class="image-actions">
+            <button class="btn" onclick="downloadImage()">
+                <i class="fas fa-download"></i> Download Image
+            </button>
+            <button class="btn btn-secondary" onclick="saveToFavorites()">
+                <i class="fas fa-heart"></i> Save to Favorites
+            </button>
+            <button class="btn btn-outline" onclick="generateAnother()">
+                <i class="fas fa-redo"></i> Generate Another
+            </button>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+let currentImageData = null;
+let currentPrompt = null;
+
+function useExample(exampleText) {
+    document.getElementById('promptText').value = exampleText;
+}
+
+document.getElementById('generateForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const prompt = document.getElementById('promptText').value.trim();
+    if (!prompt) {
+        alert('Please enter a description for your fashion design');
+        return;
+    }
+    
+    const loadingSection = document.getElementById('loadingGeneration');
+    const resultsSection = document.getElementById('resultsSection');
+    
+    // Show loading
+    loadingSection.style.display = 'block';
+    resultsSection.style.display = 'none';
+    
+    try {
+        const response = await axios.post('/api/generate_image', {
+            prompt: prompt
+        }, {
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            timeout: 120000 // 2 minute timeout
+        });
+        
+        if (response.data.success) {
+            currentImageData = response.data.image;
+            currentPrompt = response.data.prompt;
+            
+            // Display the generated image
+            const generatedImage = document.getElementById('generatedImage');
+            const promptDisplay = document.querySelector('.prompt-text');
+            
+            generatedImage.src = `data:image/png;base64,${currentImageData}`;
+            promptDisplay.textContent = `"${currentPrompt}"`;
+            
+            // Show results
+            loadingSection.style.display = 'none';
+            resultsSection.style.display = 'block';
+            
+            // Scroll to results
+            resultsSection.scrollIntoView({ behavior: 'smooth' });
+            
+        } else {
+            alert('Error: ' + response.data.message);
+            loadingSection.style.display = 'none';
+        }
+    } catch (error) {
+        console.error('Error generating image:', error);
+        alert('Error generating image. Please try again with a shorter prompt or try again later.');
+        loadingSection.style.display = 'none';
+    }
+});
+
+function downloadImage() {
+    if (!currentImageData) return;
+    
+    const link = document.createElement('a');
+    link.href = `data:image/png;base64,${currentImageData}`;
+    link.download = `fashion_design_${Date.now()}.png`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+
+async function saveToFavorites() {
+    if (!currentImageData || !currentPrompt) return;
+    
+    try {
+        const response = await axios.post('/api/add_favorite', {
+            product_name: `Generated: ${currentPrompt.substring(0, 50)}...`,
+            product_details: currentPrompt,
+            image_data: currentImageData
+        }, {
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        if (response.data.success) {
+            // Show success feedback
+            const btn = event.target;
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-check"></i> Saved!';
+            btn.style.background = '#2ecc71';
+            
+            setTimeout(() => {
+                btn.innerHTML = originalText;
+                btn.style.background = '';
+            }, 2000);
+        } else {
+            alert('Error: ' + response.data.message);
+        }
+    } catch (error) {
+        console.error('Error saving to favorites:', error);
+        alert('Error saving to favorites');
+    }
+}
+
+function generateAnother() {
+    document.getElementById('promptText').value = '';
+    document.getElementById('resultsSection').style.display = 'none';
+    document.getElementById('promptText').focus();
+    
+    // Scroll back to form
+    document.querySelector('.prompt-section').scrollIntoView({ behavior: 'smooth' });
+}
+</script>
+{% endblock %}

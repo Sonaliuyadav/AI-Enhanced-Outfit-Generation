@@ -1,0 +1,343 @@
+{% extends "base.html" %}
+
+{% block title %}Profile - AI Fashion Assistant{% endblock %}
+
+{% block extra_css %}
+<style>
+    .profile-header {
+        text-align: center;
+        margin-bottom: 3rem;
+    }
+
+    .profile-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        background: linear-gradient(45deg, #3498db, #2ecc71);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 0.5rem;
+    }
+
+    .profile-subtitle {
+        color: #5a6c7d;
+        font-size: 1.1rem;
+    }
+
+    .profile-card {
+        background: rgba(255, 255, 255, 0.9);
+        border-radius: 20px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 10px 30px rgba(52, 152, 219, 0.1);
+        border: 1px solid rgba(116, 185, 255, 0.1);
+    }
+
+    .profile-avatar {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        background: linear-gradient(45deg, #3498db, #2ecc71);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 2rem;
+        font-size: 3rem;
+        color: white;
+    }
+
+    .profile-info {
+        text-align: center;
+    }
+
+    .profile-name {
+        font-size: 1.8rem;
+        font-weight: 600;
+        color: #2c3e50;
+        margin-bottom: 0.5rem;
+    }
+
+    .profile-email {
+        color: #5a6c7d;
+        font-size: 1.1rem;
+        margin-bottom: 1rem;
+    }
+
+    .profile-joined {
+        color: #74b9ff;
+        font-size: 0.9rem;
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 2rem;
+        margin: 2rem 0;
+    }
+
+    .stat-card {
+        background: rgba(255, 255, 255, 0.9);
+        border-radius: 15px;
+        padding: 2rem;
+        text-align: center;
+        box-shadow: 0 8px 25px rgba(52, 152, 219, 0.1);
+        border: 1px solid rgba(116, 185, 255, 0.1);
+        transition: all 0.3s ease;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 35px rgba(52, 152, 219, 0.15);
+    }
+
+    .stat-icon {
+        font-size: 2.5rem;
+        background: linear-gradient(45deg, #3498db, #2ecc71);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 1rem;
+    }
+
+    .stat-number {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #2c3e50;
+        margin-bottom: 0.5rem;
+    }
+
+    .stat-label {
+        color: #5a6c7d;
+        font-size: 1rem;
+        font-weight: 500;
+    }
+
+    .profile-actions {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        flex-wrap: wrap;
+        margin-top: 2rem;
+    }
+
+    .activity-section {
+        margin-top: 3rem;
+    }
+
+    .section-title {
+        font-size: 1.8rem;
+        font-weight: 600;
+        margin-bottom: 1.5rem;
+        color: #2c3e50;
+        border-bottom: 2px solid #e3f2fd;
+        padding-bottom: 0.5rem;
+        text-align: center;
+    }
+
+    .activity-card {
+        background: rgba(255, 255, 255, 0.9);
+        border-radius: 15px;
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+        box-shadow: 0 5px 20px rgba(52, 152, 219, 0.08);
+        border: 1px solid rgba(116, 185, 255, 0.1);
+        transition: all 0.3s ease;
+    }
+
+    .activity-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(52, 152, 219, 0.12);
+    }
+
+    .activity-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 0.5rem;
+    }
+
+    .activity-icon {
+        font-size: 1.2rem;
+        margin-right: 0.5rem;
+        color: #3498db;
+    }
+
+    .activity-type {
+        font-weight: 600;
+        color: #2c3e50;
+        text-transform: capitalize;
+    }
+
+    .activity-time {
+        margin-left: auto;
+        color: #74b9ff;
+        font-size: 0.9rem;
+    }
+
+    .activity-content {
+        color: #5a6c7d;
+        line-height: 1.5;
+    }
+
+    .empty-activity {
+        text-align: center;
+        color: #5a6c7d;
+        font-style: italic;
+        padding: 2rem;
+    }
+
+    @media (max-width: 768px) {
+        .profile-title {
+            font-size: 2rem;
+        }
+        
+        .profile-actions {
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .stats-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="profile-header">
+    <h1 class="profile-title">
+        <i class="fas fa-user"></i> My Profile
+    </h1>
+    <p class="profile-subtitle">
+        Manage your account and track your fashion journey
+    </p>
+</div>
+
+<div class="profile-card">
+    <div class="profile-avatar">
+        <i class="fas fa-user"></i>
+    </div>
+    <div class="profile-info">
+        <div class="profile-name">{{ user.username }}</div>
+        <div class="profile-email">{{ user.email }}</div>
+        <div class="profile-joined">
+            <i class="fas fa-calendar-alt"></i> 
+            Member since {{ user.created_at.split(' ')[0] if user.created_at else 'Unknown' }}
+        </div>
+    </div>
+    
+    <div class="profile-actions">
+        <a href="{{ url_for('dashboard') }}" class="btn">
+            <i class="fas fa-tachometer-alt"></i> Dashboard
+        </a>
+        <a href="{{ url_for('recommend') }}" class="btn btn-secondary">
+            <i class="fas fa-search"></i> Find Styles
+        </a>
+        <a href="{{ url_for('generate') }}" class="btn btn-outline">
+            <i class="fas fa-palette"></i> Generate Design
+        </a>
+    </div>
+</div>
+
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-icon">
+            <i class="fas fa-search"></i>
+        </div>
+        <div class="stat-number">{{ total_searches }}</div>
+        <div class="stat-label">Total Searches</div>
+    </div>
+    
+    <div class="stat-card">
+        <div class="stat-icon">
+            <i class="fas fa-heart"></i>
+        </div>
+        <div class="stat-number">{{ total_favorites }}</div>
+        <div class="stat-label">Saved Favorites</div>
+    </div>
+    
+    <div class="stat-card">
+        <div class="stat-icon">
+            <i class="fas fa-palette"></i>
+        </div>
+        <div class="stat-number">{{ total_generated }}</div>
+        <div class="stat-label">Generated Designs</div>
+    </div>
+    
+    <div class="stat-card">
+        <div class="stat-icon">
+            <i class="fas fa-trophy"></i>
+        </div>
+        <div class="stat-number">
+            {% if total_searches + total_generated > 20 %}Expert
+            {% elif total_searches + total_generated > 10 %}Advanced
+            {% elif total_searches + total_generated > 5 %}Intermediate
+            {% else %}Beginner
+            {% endif %}
+        </div>
+        <div class="stat-label">Fashion Level</div>
+    </div>
+</div>
+
+<div class="activity-section">
+    <h2 class="section-title">
+        <i class="fas fa-clock"></i> Recent Activity
+    </h2>
+    
+    {% if total_searches > 0 or total_generated > 0 %}
+        <div class="activity-card">
+            <div class="activity-header">
+                <i class="fas fa-chart-line activity-icon"></i>
+                <span class="activity-type">Fashion Journey Stats</span>
+            </div>
+            <div class="activity-content">
+                You've been actively exploring fashion with {{ total_searches }} searches and {{ total_generated }} custom designs generated. 
+                {% if total_favorites > 0 %}You've saved {{ total_favorites }} items to your favorites collection.{% endif %}
+                Keep up the great work on your style journey!
+            </div>
+        </div>
+        
+        {% if total_searches > 10 %}
+        <div class="activity-card">
+            <div class="activity-header">
+                <i class="fas fa-star activity-icon"></i>
+                <span class="activity-type">Achievement Unlocked</span>
+            </div>
+            <div class="activity-content">
+                🎉 Fashion Explorer: You've completed over 10 searches! You're really diving deep into discovering your personal style.
+            </div>
+        </div>
+        {% endif %}
+        
+        {% if total_generated > 5 %}
+        <div class="activity-card">
+            <div class="activity-header">
+                <i class="fas fa-palette activity-icon"></i>
+                <span class="activity-type">Achievement Unlocked</span>
+            </div>
+            <div class="activity-content">
+                🎨 Creative Designer: You've generated over 5 custom designs! Your creativity knows no bounds.
+            </div>
+        </div>
+        {% endif %}
+        
+        {% if total_favorites > 5 %}
+        <div class="activity-card">
+            <div class="activity-header">
+                <i class="fas fa-heart activity-icon"></i>
+                <span class="activity-type">Achievement Unlocked</span>
+            </div>
+            <div class="activity-content">
+                💖 Style Curator: You've saved over 5 favorites! You're building an amazing personal collection.
+            </div>
+        </div>
+        {% endif %}
+        
+    {% else %}
+        <div class="empty-activity">
+            <i class="fas fa-compass fa-2x"></i>
+            <p>Your fashion journey is just beginning! Start by exploring recommendations or generating your first design.</p>
+        </div>
+    {% endif %}
+</div>
+
+{% endblock %}

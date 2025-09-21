@@ -1,0 +1,6 @@
+#!/bin/bash
+source .venv/bin/activate
+export FASHION_DATASET_PATH="$(pwd)/updated_recommendation.csv"
+python main.py
+deactivate
+

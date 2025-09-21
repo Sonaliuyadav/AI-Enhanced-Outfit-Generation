@@ -1,0 +1,192 @@
+{% extends "base.html" %}
+
+{% block title %}Home - AI Fashion Assistant{% endblock %}
+
+{% block extra_css %}
+<style>
+    .hero-section {
+        min-height: 100vh;
+        background: linear-gradient(rgba(116, 185, 255, 0.05), rgba(129, 236, 236, 0.05)),
+                    url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800"><defs><pattern id="fashion-pattern" x="0" y="0" width="120" height="120" patternUnits="userSpaceOnUse"><circle cx="60" cy="60" r="2" fill="%23ddeeff" opacity="0.5"/><rect x="20" y="20" width="80" height="80" fill="none" stroke="%23cce7ff" stroke-width="1" opacity="0.3"/></pattern></defs><rect width="100%" height="100%" fill="url(%23fashion-pattern)"/></svg>');
+        background-size: cover;
+        background-position: center;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        padding: 2rem;
+    }
+
+    .hero-content {
+        max-width: 800px;
+        color: #2c3e50;
+    }
+
+    .hero-title {
+        font-size: 3.5rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+        background: linear-gradient(45deg, #74b9ff, #81ecec);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .hero-subtitle {
+        font-size: 1.3rem;
+        margin-bottom: 2rem;
+        color: #5a6c7d;
+        font-weight: 400;
+        line-height: 1.6;
+    }
+
+    .hero-buttons {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        flex-wrap: wrap;
+        margin-bottom: 3rem;
+    }
+
+    .feature-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 2rem;
+        margin-top: 4rem;
+        max-width: 1000px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .feature-card {
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 20px;
+        padding: 2rem;
+        text-align: center;
+        box-shadow: 0 10px 30px rgba(116, 185, 255, 0.08);
+        transition: all 0.3s ease;
+        border: 1px solid rgba(221, 238, 255, 0.3);
+    }
+
+    .feature-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 20px 50px rgba(116, 185, 255, 0.15);
+    }
+
+    .feature-icon {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        background: linear-gradient(45deg, #74b9ff, #81ecec);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .feature-title {
+        font-size: 1.3rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        color: #2c3e50;
+    }
+
+    .feature-description {
+        color: #5a6c7d;
+        line-height: 1.6;
+    }
+
+    @media (max-width: 768px) {
+        .hero-title {
+            font-size: 2.5rem;
+        }
+        
+        .hero-subtitle {
+            font-size: 1.1rem;
+        }
+        
+        .hero-buttons {
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .feature-grid {
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="hero-section">
+    <div class="hero-content">
+        <h1 class="hero-title">
+            <i class="fas fa-magic"></i> AI Fashion Assistant
+        </h1>
+        <p class="hero-subtitle">
+            Discover your perfect style with AI-powered fashion recommendations and custom design generation. 
+            Let our intelligent assistant help you find the ideal outfit for any occasion.
+        </p>
+        
+        <div class="hero-buttons">
+            {% if session.user_id %}
+                <a href="{{ url_for('dashboard') }}" class="btn">
+                    <i class="fas fa-tachometer-alt"></i> Go to Dashboard
+                </a>
+                <a href="{{ url_for('recommend') }}" class="btn btn-secondary">
+                    <i class="fas fa-search"></i> Find Recommendations
+                </a>
+            {% else %}
+                <a href="{{ url_for('signup') }}" class="btn">
+                    <i class="fas fa-user-plus"></i> Get Started
+                </a>
+                <a href="{{ url_for('login') }}" class="btn btn-outline">
+                    <i class="fas fa-sign-in-alt"></i> Sign In
+                </a>
+            {% endif %}
+        </div>
+
+        <div class="feature-grid">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-search"></i>
+                </div>
+                <h3 class="feature-title">Smart Recommendations</h3>
+                <p class="feature-description">
+                    Get personalized fashion recommendations based on your preferences, category, style, and occasion using advanced AI algorithms.
+                </p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-palette"></i>
+                </div>
+                <h3 class="feature-title">Custom Design Generation</h3>
+                <p class="feature-description">
+                    Describe your dream outfit and watch our AI generate unique fashion designs tailored to your vision and style preferences.
+                </p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-heart"></i>
+                </div>
+                <h3 class="feature-title">Save Favorites</h3>
+                <p class="feature-description">
+                    Build your personal fashion collection by saving your favorite recommendations and generated designs for future reference.
+                </p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <h3 class="feature-title">Style Analytics</h3>
+                <p class="feature-description">
+                    Track your fashion journey with detailed analytics on your search history, preferences, and style evolution over time.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

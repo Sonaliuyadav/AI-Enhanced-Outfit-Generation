@@ -1,0 +1,207 @@
+{% extends "base.html" %}
+
+{% block title %}
+{% if mode == 'signup' %}Sign Up{% else %}Login{% endif %} - AI Fashion Assistant
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .auth-container {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        padding: 2rem;
+    }
+
+    .auth-card {
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 20px;
+        padding: 3rem;
+        box-shadow: 0 15px 50px rgba(52, 152, 219, 0.1);
+        width: 100%;
+        max-width: 400px;
+        text-align: center;
+        border: 1px solid rgba(116, 185, 255, 0.1);
+    }
+
+    .auth-title {
+        font-size: 2.2rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+        background: linear-gradient(45deg, #3498db, #2ecc71);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .auth-subtitle {
+        color: #5a6c7d;
+        margin-bottom: 2rem;
+        font-size: 1rem;
+    }
+
+    .auth-form {
+        text-align: left;
+    }
+
+    .form-group {
+        position: relative;
+        margin-bottom: 1.5rem;
+    }
+
+    .form-control {
+        padding-left: 45px;
+    }
+
+    .input-icon {
+        position: absolute;
+        left: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #74b9ff;
+        font-size: 1.1rem;
+    }
+
+    .auth-button {
+        width: 100%;
+        margin-bottom: 1rem;
+        padding: 15px;
+        font-size: 1.1rem;
+    }
+
+    .auth-switch {
+        text-align: center;
+        margin-top: 2rem;
+        color: #5a6c7d;
+    }
+
+    .auth-switch a {
+        color: #3498db;
+        text-decoration: none;
+        font-weight: 600;
+    }
+
+    .auth-switch a:hover {
+        text-decoration: underline;
+    }
+
+    .alert {
+        display: none;
+        margin-bottom: 1rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="auth-card">
+        <h2 class="auth-title">
+            <i class="fas fa-magic"></i>
+            {% if mode == 'signup' %}Join Fashion AI{% else %}Welcome Back{% endif %}
+        </h2>
+        <p class="auth-subtitle">
+            {% if mode == 'signup' %}Create your account to start your fashion journey{% else %}Sign in to continue your style discovery{% endif %}
+        </p>
+
+        <div id="alert" class="alert"></div>
+
+        <form class="auth-form" id="authForm">
+            {% if mode == 'signup' %}
+            <div class="form-group">
+                <i class="fas fa-user input-icon"></i>
+                <input type="text" id="username" class="form-control" placeholder="Username" required>
+            </div>
+            <div class="form-group">
+                <i class="fas fa-envelope input-icon"></i>
+                <input type="email" id="email" class="form-control" placeholder="Email Address" required>
+            </div>
+            {% else %}
+            <div class="form-group">
+                <i class="fas fa-user input-icon"></i>
+                <input type="text" id="username" class="form-control" placeholder="Username or Email" required>
+            </div>
+            {% endif %}
+            
+            <div class="form-group">
+                <i class="fas fa-lock input-icon"></i>
+                <input type="password" id="password" class="form-control" placeholder="Password" required>
+            </div>
+
+            <button type="submit" class="btn auth-button">
+                <i class="fas fa-{% if mode == 'signup' %}user-plus{% else %}sign-in-alt{% endif %}"></i>
+                {% if mode == 'signup' %}Create Account{% else %}Sign In{% endif %}
+            </button>
+        </form>
+
+        <div class="auth-switch">
+            {% if mode == 'signup' %}
+                Already have an account? <a href="{{ url_for('login') }}">Sign In</a>
+            {% else %}
+                Don't have an account? <a href="{{ url_for('signup') }}">Sign Up</a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.getElementById('authForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const alertDiv = document.getElementById('alert');
+    const submitBtn = e.target.querySelector('button[type="submit"]');
+    
+    // Show loading state
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+    submitBtn.disabled = true;
+    
+    // Collect form data
+    const formData = {
+        username: document.getElementById('username').value,
+        password: document.getElementById('password').value
+    };
+    
+    {% if mode == 'signup' %}
+    formData.email = document.getElementById('email').value;
+    {% endif %}
+    
+    try {
+        const response = await axios.post('{{ url_for(mode) }}', formData, {
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        if (response.data.success) {
+            alertDiv.className = 'alert alert-success';
+            alertDiv.textContent = response.data.message;
+            alertDiv.style.display = 'block';
+            
+            // Redirect after success
+            setTimeout(() => {
+                {% if mode == 'signup' %}
+                window.location.href = '{{ url_for("login") }}';
+                {% else %}
+                window.location.href = '{{ url_for("dashboard") }}';
+                {% endif %}
+            }, 1500);
+        } else {
+            alertDiv.className = 'alert alert-error';
+            alertDiv.textContent = response.data.message;
+            alertDiv.style.display = 'block';
+        }
+    } catch (error) {
+        alertDiv.className = 'alert alert-error';
+        alertDiv.textContent = 'An error occurred. Please try again.';
+        alertDiv.style.display = 'block';
+    }
+    
+    // Reset button
+    submitBtn.innerHTML = '<i class="fas fa-{% if mode == "signup" %}user-plus{% else %}sign-in-alt{% endif %}"></i> {% if mode == "signup" %}Create Account{% else %}Sign In{% endif %}';
+    submitBtn.disabled = false;
+});
+</script>
+{% endblock %}
